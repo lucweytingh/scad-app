@@ -4,8 +4,8 @@ from pathlib import Path
 from PIL import Image
 
 # Paths to directories
-texture_dir = Path("generated_textures")  # Directory with original textures
-render_dir = Path("generated_textures_render")  # Directory with rendered images
+texture_dir = Path("dev_textures")  # Directory with original textures
+render_dir = Path("dev_textures_rendered")  # Directory with rendered images
 csv_file_path = sorted(Path("prompts").glob("*.csv"))[-1]  # Latest CSV file with prompts
 
 # Load the CSV file containing prompts
@@ -26,7 +26,7 @@ else:
     else:
         # Display each rendered image with its corresponding prompt and textures
         for index, row in prompts_df.iterrows():
-            image_id = row["id"]  # Adjust the column name to match your CSV structure
+            image_id = row["prompt_id"]  # Adjust the column name to match your CSV structure
             prompt = row["prompt"]  # Adjust the column name to match your CSV structure
             fnames = [f"{image_id:02d}-{i:02d}.png" for i in range(4)]
             render_paths = [render_dir / fname for fname in fnames]  # Rendered image path
