@@ -6,7 +6,7 @@ from PIL import Image
 # Paths to directories
 texture_dir = Path("dev_textures")  # Directory with original textures
 render_dir = Path("dev_textures_rendered")  # Directory with rendered images
-csv_file_path = sorted(Path("prompts").glob("*.csv"))[-1]  # Latest CSV file with prompts
+csv_file_path = sorted(Path("dev_prompts").glob("*.csv"))[-1]  # Latest CSV file with prompts
 
 # Load the CSV file containing prompts
 if not csv_file_path.exists():
