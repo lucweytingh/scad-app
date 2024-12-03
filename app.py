@@ -5,7 +5,7 @@ from PIL import Image
 
 # Paths to directories
 texture_dir = Path("dev_textures")  # Directory with original textures
-render_dir = Path("dev_textures_rendered")  # Directory with rendered images
+render_dir = Path("dev_textures_rendered")  # Directory with rendered videos
 csv_file_path = sorted(Path("dev_prompts").glob("*.csv"))[-1]  # Latest CSV file with prompts
 
 # Load the CSV file containing prompts
@@ -16,7 +16,7 @@ else:
     prompts_df = pd.read_csv(csv_file_path)
 
     # Set up Streamlit app
-    st.title("Rendered Images with Prompts and Textures")
+    st.title("Rendered Videos with Prompts and Textures")
 
     # Ensure the folders exist
     if not render_dir.exists():
@@ -24,12 +24,12 @@ else:
     elif not texture_dir.exists():
         st.error(f"Texture directory not found at {texture_dir}")
     else:
-        # Display each rendered image with its corresponding prompt and textures
+        # Display each rendered video with its corresponding prompt and textures
         for index, row in prompts_df.iterrows():
             image_id = row["bin_id"]  # Adjust the column name to match your CSV structure
             prompt = row["prompt"]  # Adjust the column name to match your CSV structure
             fnames = [f"{image_id:02d}-{i:02d}.png" for i in range(4)]
-            render_paths = [render_dir / fname for fname in fnames]  # Rendered image path
+            render_paths = [render_dir / (f"{Path(fname).stem}.mp4") for fname in fnames]  # Rendered video path
             texture_paths = [texture_dir / fname for fname in fnames]  # Original texture path
 
             # Check if the files exist
@@ -40,27 +40,20 @@ else:
                 st.subheader(f"Prompt ID: {image_id}")
                 st.text(f"Prompt: {prompt}")
 
-                # Load the images
-                render_images = [Image.open(render_path) for render_path in render_paths]
+                # Load the textures
                 texture_images = [Image.open(texture_path) for texture_path in texture_paths]
 
-                # Sidebar for texture selection
-                st.sidebar.header(f"Select Texture for ID: {image_id}")
-                selected_texture = st.sidebar.radio(
-                    "Choose a texture:",
-                    options=list(range(4)),
-                    format_func=lambda i: f"Texture {i+1}",
-                    key=f"texture_selector_{image_id}"
-                )
-
-                # Display the selected rendered image in the left column
+                # Display the selected rendered video in the left column
                 col1, col2 = st.columns([0.8, 0.2])
+
                 with col1:
-                    st.image(
-                        render_images[selected_texture],
-                        caption=f"Rendered image for Texture {selected_texture + 1}",
-                        use_container_width=True,
-                    )
+                    rows = [render_paths[i:i + 2] for i in range(0, len(render_paths), 2)]  # Divide into chunks of 2
+                    for row in rows:
+                        cols = st.columns(2)  # Always create 2 columns for a 2x2 grid
+                        for idx, video_path in enumerate(row):
+                            with cols[idx]:
+                                st.video(str(video_path))
+
                 with col2:
                     for i in range(4):
                         st.image(
@@ -73,4 +66,4 @@ else:
 
         # Add a footer
         st.markdown("---")
-        st.text("End of images.")
+        st.text("End of videos.")
